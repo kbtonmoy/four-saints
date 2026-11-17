@@ -94,7 +94,6 @@ export async function createTrip(formData: FormData) {
 }
 
 export async function addExpense(formData: FormData) {
-  await requireAdmin();
   const tripId = formData.get("tripId") as string;
   const tripSlug = formData.get("tripSlug") as string;
   const title = (formData.get("title") as string)?.trim();
@@ -180,7 +179,6 @@ export async function deleteExpense(formData: FormData) {
 }
 
 export async function recordSettlement(formData: FormData) {
-  await requireAdmin();
   const tripId = formData.get("tripId") as string;
   const tripSlug = formData.get("tripSlug") as string;
   const fromMemberId = formData.get("fromMemberId") as string;

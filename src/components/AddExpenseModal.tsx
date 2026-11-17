@@ -53,21 +53,54 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const loadMemberPreference = () => {
+    const saved = localStorage.getItem(`tour-expense-members:${tripId}`);
+    if (!saved) return;
+
+    try {
+      const preference = JSON.parse(saved) as { paidById?: string; splitMemberIds?: string[] };
+      const memberIds = new Set(members.map((member) => member.id));
+      if (preference.paidById && memberIds.has(preference.paidById)) {
+        setPaidById(preference.paidById);
+      }
+      const validSplits = preference.splitMemberIds?.filter((id) => memberIds.has(id));
+      if (validSplits?.length) setSelectedSplits(validSplits);
+    } catch {
+      localStorage.removeItem(`tour-expense-members:${tripId}`);
+    }
+  };
+
+  const rememberMembers = (nextPaidById: string, nextSplits: string[]) => {
+    localStorage.setItem(
+      `tour-expense-members:${tripId}`,
+      JSON.stringify({ paidById: nextPaidById, splitMemberIds: nextSplits })
+    );
+  };
+
   const numAmount = parseFloat(amount) || 0;
   const splitCount = selectedSplits.length;
   const perPersonShare =
     splitCount > 0 ? (numAmount / splitCount).toFixed(2) : "0.00";
 
   const toggleSplit = (id: string) => {
-    setSelectedSplits((prev) =>
-      prev.includes(id)
+    setSelectedSplits((prev) => {
+      const next = prev.includes(id)
         ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
+        : [...prev, id];
+      rememberMembers(paidById, next);
+      return next;
+    });
   };
 
-  const selectAll = () => setSelectedSplits(members.map((m) => m.id));
-  const deselectAll = () => setSelectedSplits([]);
+  const selectAll = () => {
+    const allMemberIds = members.map((m) => m.id);
+    setSelectedSplits(allMemberIds);
+    rememberMembers(paidById, allMemberIds);
+  };
+  const deselectAll = () => {
+    setSelectedSplits([]);
+    rememberMembers(paidById, []);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -107,7 +140,6 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
         setAmount("");
         setNotes("");
         setEntryDate(getLocalDateTimeString());
-        setSelectedSplits(members.map((m) => m.id));
         setIsOpen(false);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to record expense");
@@ -119,6 +151,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
     <>
       <button
         onClick={() => {
+          loadMemberPreference();
           setEntryDate(getLocalDateTimeString());
           setIsOpen(true);
         }}
@@ -222,7 +255,10 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
                   </label>
                   <select
                     value={paidById}
-                    onChange={(e) => setPaidById(e.target.value)}
+                    onChange={(e) => {
+                      setPaidById(e.target.value);
+                      rememberMembers(e.target.value, selectedSplits);
+                    }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {members.map((m) => (

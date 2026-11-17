@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { AddExpenseModal } from "./AddExpenseModal";
 import { RecordSettlementModal } from "./RecordSettlementModal";
-import { ShareTripButton } from "./ShareTripButton";
 import { deleteExpense, deleteSettlement } from "@/lib/actions";
 import type { MemberBalance, SuggestedSettlement } from "@/lib/settlement";
 
@@ -146,10 +145,8 @@ export function TripView({
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <ShareTripButton title={trip.title} />
-              {!readOnly && (
-                <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
-              )}
+              <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
+              <RecordSettlementModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
             </div>
           </div>
 
@@ -307,16 +304,6 @@ export function TripView({
           </button>
         </div>
 
-        {!readOnly && activeTab === "settlements" && (
-          <div className="self-end pb-2">
-            <RecordSettlementModal
-              tripId={trip.id}
-              tripSlug={trip.slug}
-              currency={trip.currency}
-              members={members}
-            />
-          </div>
-        )}
       </div>
 
       {/* Tab 1: Expenses List */}
@@ -333,9 +320,7 @@ export function TripView({
               <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mx-auto mt-1 mb-5">
                 Hit &quot;Add Expense&quot; above whenever someone spends on food, transport, stay, or fuel!
               </p>
-              {!readOnly && (
-                <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
-              )}
+              <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
             </div>
           ) : (
             expenses.map((exp) => (
