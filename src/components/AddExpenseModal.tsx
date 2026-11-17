@@ -163,10 +163,10 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
-          <div className="max-h-[94dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:border-zinc-800 dark:bg-zinc-900 sm:my-8 sm:rounded-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center overflow-hidden bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
+          <div className="flex h-[100dvh] min-w-0 w-full max-w-lg flex-col overflow-hidden bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:bg-zinc-900 sm:h-auto sm:max-h-[94dvh] sm:rounded-2xl sm:border sm:border-zinc-200 sm:dark:border-zinc-800">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 bg-zinc-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50 sm:px-6 sm:py-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
                   {currency}
@@ -175,9 +175,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
                   <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                     Add Tour Expense
                   </h3>
-                  <p className="text-xs text-zinc-500">
-                    Auto-stamped with date & time
-                  </p>
+                  <p className="text-xs text-zinc-500">Add amount, payer and split</p>
                 </div>
               </div>
               <button
@@ -190,7 +188,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto p-4 sm:p-6">
               {error && (
                 <div className="p-3 text-sm rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300">
                   {error}
@@ -272,7 +270,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
 
               {/* Auto Date & Time */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
+                <label className="flex flex-col items-start gap-1 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
                   <span className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-indigo-500" /> Date & Time of Entry (Auto-recorded)
                   </span>
@@ -288,7 +286,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
                   type="datetime-local"
                   value={entryDate}
                   onChange={(e) => setEntryDate(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="min-w-0 max-w-full w-full px-3.5 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -361,7 +359,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
               </div>
 
               {/* Actions */}
-              <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-800 sm:flex sm:items-center sm:justify-end">
+              <div className="sticky bottom-0 -mx-4 grid grid-cols-2 gap-3 border-t border-zinc-100 bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 dark:border-zinc-800 dark:bg-zinc-900 sm:static sm:mx-0 sm:flex sm:items-center sm:justify-end sm:px-0 sm:pb-0 sm:pt-4">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}

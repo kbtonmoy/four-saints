@@ -105,10 +105,10 @@ export function RecordSettlementModal({
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
-          <div className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:border-zinc-800 dark:bg-zinc-900 sm:rounded-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center overflow-hidden bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
+          <div className="flex h-[100dvh] min-w-0 w-full max-w-md flex-col overflow-hidden bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:bg-zinc-900 sm:h-auto sm:max-h-[92dvh] sm:rounded-2xl sm:border sm:border-zinc-200 sm:dark:border-zinc-800">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-emerald-50/50 dark:bg-emerald-950/30">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 bg-emerald-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-emerald-950/30 sm:px-6 sm:py-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <Handshake className="w-5 h-5" />
@@ -132,7 +132,7 @@ export function RecordSettlementModal({
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto p-4 sm:p-6">
               {error && (
                 <div className="p-3 text-sm rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300">
                   {error}
@@ -140,7 +140,7 @@ export function RecordSettlementModal({
               )}
 
               {/* From -> To */}
-              <div className="flex items-center gap-2">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
                 <div className="flex-1 space-y-1">
                   <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     Who Paid?
@@ -212,7 +212,7 @@ export function RecordSettlementModal({
               </div>
 
               {/* Actions */}
-              <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-800 sm:flex sm:items-center sm:justify-end">
+              <div className="sticky bottom-0 -mx-4 grid grid-cols-2 gap-3 border-t border-zinc-100 bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 dark:border-zinc-800 dark:bg-zinc-900 sm:static sm:mx-0 sm:flex sm:items-center sm:justify-end sm:px-0 sm:pb-0 sm:pt-4">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
