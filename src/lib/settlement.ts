@@ -32,6 +32,21 @@ export interface CalculateSettlementInput {
   }[];
 }
 
+export function splitAmountEvenly(amount: number, count: number): number[] {
+  if (!Number.isFinite(amount) || amount <= 0 || !Number.isInteger(count) || count <= 0) {
+    throw new Error("Invalid split");
+  }
+
+  const totalCents = Math.round(amount * 100);
+  const baseCents = Math.floor(totalCents / count);
+  const remainder = totalCents % count;
+
+  return Array.from(
+    { length: count },
+    (_, index) => (baseCents + (index < remainder ? 1 : 0)) / 100
+  );
+}
+
 export function calculateTripBalances(input: CalculateSettlementInput) {
   const { members, expenses, settlements } = input;
 
@@ -52,12 +67,12 @@ export function calculateTripBalances(input: CalculateSettlementInput) {
   // 1. Process group expenses
   for (const exp of expenses) {
     if (balanceMap[exp.paidById]) {
-      balanceMap[exp.paidById].totalPaid += exp.amount;
+      balanceMap[exp.paidById].totalPaid += Math.round(exp.amount * 100);
     }
 
     for (const split of exp.splits) {
       if (balanceMap[split.memberId]) {
-        balanceMap[split.memberId].totalShare += split.amount;
+        balanceMap[split.memberId].totalShare += Math.round(split.amount * 100);
       }
     }
   }
@@ -65,10 +80,10 @@ export function calculateTripBalances(input: CalculateSettlementInput) {
   // 2. Process recorded settlement payments
   for (const set of settlements) {
     if (balanceMap[set.fromMemberId]) {
-      balanceMap[set.fromMemberId].settlementPaid += set.amount;
+      balanceMap[set.fromMemberId].settlementPaid += Math.round(set.amount * 100);
     }
     if (balanceMap[set.toMemberId]) {
-      balanceMap[set.toMemberId].settlementReceived += set.amount;
+      balanceMap[set.toMemberId].settlementReceived += Math.round(set.amount * 100);
     }
   }
 
@@ -77,10 +92,11 @@ export function calculateTripBalances(input: CalculateSettlementInput) {
     const b = balanceMap[m.id];
     // Net balance = (what I paid out) - (what I consumed)
     b.netBalance =
-      Math.round(
-        (b.totalPaid + b.settlementPaid - (b.totalShare + b.settlementReceived)) *
-          100
-      ) / 100;
+      (b.totalPaid + b.settlementPaid - b.totalShare - b.settlementReceived) / 100;
+    b.totalPaid /= 100;
+    b.totalShare /= 100;
+    b.settlementPaid /= 100;
+    b.settlementReceived /= 100;
   }
 
   // 4. Calculate minimal debt settlements

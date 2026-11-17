@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, X, Calendar, DollarSign, Users, Tag, Clock } from "lucide-react";
+import { Plus, X, DollarSign, Users, Tag, Clock } from "lucide-react";
 import { addExpense } from "@/lib/actions";
 
 interface Member {
@@ -130,8 +130,8 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
+          <div className="max-h-[94dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:border-zinc-800 dark:bg-zinc-900 sm:my-8 sm:rounded-2xl">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
               <div className="flex items-center gap-2.5">
@@ -268,7 +268,7 @@ export function AddExpenseModal({ tripId, tripSlug, currency, members }: Props) 
                       onClick={selectAll}
                       className="text-indigo-600 dark:text-indigo-400 hover:underline"
                     >
-                      All 4
+                      All
                     </button>
                     <span className="text-zinc-300 dark:text-zinc-700">|</span>
                     <button

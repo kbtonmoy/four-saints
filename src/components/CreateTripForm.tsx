@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, Trash2, Compass, ArrowRight } from "lucide-react";
+import { Plus, Trash2, ArrowRight } from "lucide-react";
 import { createTrip } from "@/lib/actions";
 
 export function CreateTripForm() {

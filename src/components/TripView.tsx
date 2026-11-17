@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Wallet,
   Receipt,
   Users,
   Handshake,
@@ -54,6 +53,7 @@ interface SettlementItem {
 }
 
 interface Props {
+  readOnly?: boolean;
   trip: {
     id: string;
     slug: string;
@@ -81,6 +81,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export function TripView({
+  readOnly = false,
   trip,
   members,
   expenses,
@@ -99,6 +100,7 @@ export function TripView({
     categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
   }
   const categoryList = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+  const maxBalance = Math.max(...memberBalances.map((m) => Math.abs(m.netBalance)), 1);
 
   const formatDate = (dateInput: Date | string) => {
     const d = new Date(dateInput);
@@ -119,15 +121,15 @@ export function TripView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top Header Card */}
-      <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-4 sm:rounded-3xl sm:p-8 shadow-xl relative overflow-hidden">
         {/* Background glow decoration */}
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-10 -top-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 sm:pb-6 border-b border-white/10">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs uppercase tracking-widest font-semibold text-indigo-300">
@@ -138,29 +140,26 @@ export function TripView({
                   {members.length} Members
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
                 {trip.title}
               </h1>
             </div>
 
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               <ShareTripButton title={trip.title} />
-              <AddExpenseModal
-                tripId={trip.id}
-                tripSlug={trip.slug}
-                currency={trip.currency}
-                members={members}
-              />
+              {!readOnly && (
+                <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
+              )}
             </div>
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6">
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 pt-4 sm:pt-6">
+            <div className="bg-white/5 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/10">
               <span className="text-xs font-medium text-indigo-200">
                 Total Tour Spent
               </span>
-              <p className="text-xl sm:text-2xl font-bold mt-1 text-white">
+              <p className="text-lg sm:text-2xl font-bold mt-1 text-white break-words">
                 {trip.currency} {totalTripSpending.toLocaleString()}
               </p>
               <span className="text-[11px] text-white/50">
@@ -168,11 +167,11 @@ export function TripView({
               </span>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+            <div className="bg-white/5 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/10">
               <span className="text-xs font-medium text-indigo-200">
                 Average / Person
               </span>
-              <p className="text-xl sm:text-2xl font-bold mt-1 text-white">
+              <p className="text-lg sm:text-2xl font-bold mt-1 text-white break-words">
                 {trip.currency} {Number(averagePerPerson).toLocaleString()}
               </p>
               <span className="text-[11px] text-white/50">
@@ -180,7 +179,7 @@ export function TripView({
               </span>
             </div>
 
-            <div className="col-span-2 sm:col-span-1 bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex flex-col justify-between">
+            <div className="col-span-2 sm:col-span-1 bg-white/5 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/10 flex flex-col justify-between">
               <span className="text-xs font-medium text-indigo-200">
                 Settlement Status
               </span>
@@ -210,18 +209,18 @@ export function TripView({
       </div>
 
       {/* Member Balances Summary Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xs">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs">
         <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-3 flex items-center gap-2">
           <Users className="w-4 h-4 text-indigo-500" /> Members Net Balance
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
           {memberBalances.map((m) => {
             const isCreditor = m.netBalance > 0.01;
             const isDebtor = m.netBalance < -0.01;
             return (
               <div
                 key={m.memberId}
-                className={`p-3.5 rounded-xl border transition-all ${
+                className={`min-w-0 p-3 sm:p-3.5 rounded-xl border transition-all ${
                   isCreditor
                     ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60"
                     : isDebtor
@@ -229,8 +228,8 @@ export function TripView({
                     : "bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-700/60"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="max-w-full truncate font-semibold text-sm text-zinc-900 dark:text-zinc-100">
                     {m.name}
                   </span>
                   <span
@@ -247,9 +246,15 @@ export function TripView({
                     {!isCreditor && !isDebtor && "Settled"}
                   </span>
                 </div>
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
+                  <div
+                    className={`h-full rounded-full ${isCreditor ? "bg-emerald-500" : isDebtor ? "bg-rose-500" : "bg-zinc-400"}`}
+                    style={{ width: `${Math.max((Math.abs(m.netBalance) / maxBalance) * 100, isCreditor || isDebtor ? 6 : 0)}%` }}
+                  />
+                </div>
                 <div className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
-                  <span>Paid: {trip.currency} {m.totalPaid.toFixed(0)}</span>
-                  <span>Share: {trip.currency} {m.totalShare.toFixed(0)}</span>
+                  <span>Paid {trip.currency}{m.totalPaid.toFixed(0)}</span>
+                  <span>Share {trip.currency}{m.totalShare.toFixed(0)}</span>
                 </div>
               </div>
             );
@@ -258,11 +263,11 @@ export function TripView({
       </div>
 
       {/* Tabs Control */}
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800">
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-2 border-b border-zinc-200 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
+        <div className="grid w-full grid-cols-3 sm:flex sm:w-auto sm:gap-2">
           <button
             onClick={() => setActiveTab("expenses")}
-            className={`flex items-center gap-2 pb-3 px-3 font-semibold text-sm transition-all border-b-2 cursor-pointer ${
+            className={`flex min-w-0 items-center justify-center gap-1.5 px-1 pb-3 text-xs font-semibold transition-all border-b-2 cursor-pointer sm:px-3 sm:text-sm ${
               activeTab === "expenses"
                 ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
                 : "border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
@@ -274,14 +279,14 @@ export function TripView({
 
           <button
             onClick={() => setActiveTab("settlements")}
-            className={`flex items-center gap-2 pb-3 px-3 font-semibold text-sm transition-all border-b-2 cursor-pointer ${
+            className={`flex min-w-0 items-center justify-center gap-1.5 px-1 pb-3 text-xs font-semibold transition-all border-b-2 cursor-pointer sm:px-3 sm:text-sm ${
               activeTab === "settlements"
                 ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
                 : "border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
             }`}
           >
             <Handshake className="w-4 h-4" />
-            <span>Settlement Plan</span>
+            <span><span className="sm:hidden">Settle</span><span className="hidden sm:inline">Settlement Plan</span></span>
             {suggestedSettlements.length > 0 && (
               <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">
                 {suggestedSettlements.length}
@@ -291,7 +296,7 @@ export function TripView({
 
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex items-center gap-2 pb-3 px-3 font-semibold text-sm transition-all border-b-2 cursor-pointer ${
+            className={`flex min-w-0 items-center justify-center gap-1.5 px-1 pb-3 text-xs font-semibold transition-all border-b-2 cursor-pointer sm:px-3 sm:text-sm ${
               activeTab === "stats"
                 ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
                 : "border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
@@ -302,8 +307,8 @@ export function TripView({
           </button>
         </div>
 
-        {activeTab === "settlements" && (
-          <div className="pb-2">
+        {!readOnly && activeTab === "settlements" && (
+          <div className="self-end pb-2">
             <RecordSettlementModal
               tripId={trip.id}
               tripSlug={trip.slug}
@@ -326,14 +331,11 @@ export function TripView({
                 No tour expenses recorded yet
               </h3>
               <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mx-auto mt-1 mb-5">
-                Hit "Add Expense" above whenever someone spends on food, transport, stay, or fuel!
+                Hit &quot;Add Expense&quot; above whenever someone spends on food, transport, stay, or fuel!
               </p>
-              <AddExpenseModal
-                tripId={trip.id}
-                tripSlug={trip.slug}
-                currency={trip.currency}
-                members={members}
-              />
+              {!readOnly && (
+                <AddExpenseModal tripId={trip.id} tripSlug={trip.slug} currency={trip.currency} members={members} />
+              )}
             </div>
           ) : (
             expenses.map((exp) => (
@@ -403,7 +405,7 @@ export function TripView({
                     </p>
                   </div>
 
-                  <form action={deleteExpense}>
+                  {!readOnly && <form action={deleteExpense}>
                     <input type="hidden" name="expenseId" value={exp.id} />
                     <input type="hidden" name="tripSlug" value={trip.slug} />
                     <button
@@ -418,7 +420,7 @@ export function TripView({
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  </form>
+                  </form>}
                 </div>
               </div>
             ))
@@ -430,14 +432,14 @@ export function TripView({
       {activeTab === "settlements" && (
         <div className="space-y-6">
           {/* Active Required Settlements */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xs">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100">
                   Optimal Settlement Plan
                 </h3>
                 <p className="text-xs text-zinc-500">
-                  Calculates minimum transfers needed to balance all 4 people.
+                  Calculates minimum transfers needed to balance the group.
                 </p>
               </div>
             </div>
@@ -482,7 +484,7 @@ export function TripView({
                         {trip.currency} {s.amount.toFixed(2)}
                       </span>
 
-                      <RecordSettlementModal
+                      {!readOnly && <RecordSettlementModal
                         tripId={trip.id}
                         tripSlug={trip.slug}
                         currency={trip.currency}
@@ -498,7 +500,7 @@ export function TripView({
                             Mark Settled
                           </button>
                         }
-                      />
+                      />}
                     </div>
                   </div>
                 ))}
@@ -507,7 +509,7 @@ export function TripView({
           </div>
 
           {/* Recorded Payments History */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xs">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
             <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 mb-1">
               Settlement History
             </h3>
@@ -524,7 +526,7 @@ export function TripView({
                 {settlements.map((set) => (
                   <div
                     key={set.id}
-                    className="p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between"
+                    className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/30 flex items-start justify-between gap-2 sm:p-3.5 sm:items-center"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -541,7 +543,7 @@ export function TripView({
                       </div>
                     </div>
 
-                    <form action={deleteSettlement}>
+                    {!readOnly && <form action={deleteSettlement}>
                       <input type="hidden" name="settlementId" value={set.id} />
                       <input type="hidden" name="tripSlug" value={trip.slug} />
                       <button
@@ -556,7 +558,7 @@ export function TripView({
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                    </form>
+                    </form>}
                   </div>
                 ))}
               </div>
@@ -569,7 +571,7 @@ export function TripView({
       {activeTab === "stats" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Spending by Category */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xs">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
             <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 mb-1 flex items-center gap-2">
               <Tag className="w-4 h-4 text-indigo-500" /> Spending by Category
             </h3>
@@ -611,7 +613,7 @@ export function TripView({
           </div>
 
           {/* Member Spending Table */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xs">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs">
             <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 mb-1 flex items-center gap-2">
               <Users className="w-4 h-4 text-indigo-500" /> Member Details
             </h3>
