@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Trip {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  title       String
+  currency    String             @default("৳")
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  members     Member[]
+  expenses    Expense[]
+  settlements SettlementRecord[]
+}
+
+model Member {
+  id                  String             @id @default(cuid())
+  name                String
+  tripId              String
+  trip                Trip               @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt           DateTime           @default(now())
+  paidExpenses        Expense[]          @relation("ExpensePayer")
+  splits              ExpenseSplit[]
+  settlementsPaid     SettlementRecord[] @relation("SettlementFrom")
+  settlementsReceived SettlementRecord[] @relation("SettlementTo")
+
+  @@unique([tripId, name])
+}
+
+model Expense {
+  id        String         @id @default(cuid())
+  tripId    String
+  trip      Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  title     String
+  amount    Float
+  category  String         @default("General")
+  paidById  String
+  paidBy    Member         @relation("ExpensePayer", fields: [paidById], references: [id], onDelete: Cascade)
+  date      DateTime       @default(now())
+  createdAt DateTime       @default(now())
+  notes     String?
+  splits    ExpenseSplit[]
+}
+
+model ExpenseSplit {
+  id        String   @id @default(cuid())
+  expenseId String
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  amount    Float
+
+  @@unique([expenseId, memberId])
+}
+
+model SettlementRecord {
+  id           String   @id @default(cuid())
+  tripId       String
+  trip         Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromMemberId String
+  fromMember   Member   @relation("SettlementFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+  toMemberId   String
+  toMember     Member   @relation("SettlementTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+  amount       Float
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
